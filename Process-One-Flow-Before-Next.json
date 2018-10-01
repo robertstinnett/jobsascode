@@ -1,0 +1,259 @@
+{
+  "RLS_CIRCLERUN_DEMO" : {
+    "Type" : "Folder",
+    "ControlmServer" : "mycontrolm",
+    "SubApplication" : "Circular Run",
+    "OrderMethod" : "Manual",
+    "Application" : "Demonstration",
+    "ActiveRetentionPolicy" : "CleanEndedOK",
+    "When" : {
+      "RuleBasedCalendars" : {
+        "Included" : [ "EVERYDAY" ],
+        "EVERYDAY" : {
+          "Type" : "Calendar:RuleBased",
+          "When" : {
+            "DaysRelation" : "OR",
+            "WeekDays" : [ "NONE" ],
+            "MonthDays" : [ "ALL" ]
+          }
+        }
+      }
+    },
+    "JobA" : {
+      "Type" : "Job:Command",
+      "SubApplication" : "Circular Run",
+      "Priority" : "Medium",
+      "Host" : "linuxserver",
+      "RunAs" : "root",
+      "Application" : "Demonstration",
+      "Command" : "dir",
+      "When" : {
+        "WeekDays" : [ "NONE" ],
+        "MonthDays" : [ "ALL" ],
+        "DaysRelation" : "OR"
+      },
+      "CIRCULAR-RUN-CONTROL" : {
+        "Type" : "Resource:Mutex",
+        "MutexType" : "Exclusive"
+      },
+      "eventsToAdd" : {
+        "Type" : "AddEvents",
+        "Events" : [ {
+          "Event" : "JobA_TO_JobB"
+        }, {
+          "Event" : "JobA_TO_JobC"
+        } ]
+      }
+    },
+    "JobB" : {
+      "Type" : "Job:Command",
+      "SubApplication" : "Circular Run",
+      "Priority" : "Very High",
+      "Host" : "linuxserver",
+      "RunAs" : "root",
+      "Application" : "Demonstration",
+      "Command" : "_sleep 10",
+      "When" : {
+        "WeekDays" : [ "NONE" ],
+        "MonthDays" : [ "ALL" ],
+        "DaysRelation" : "OR"
+      },
+      "CIRCULAR-RUN-CONTROL" : {
+        "Type" : "Resource:Mutex",
+        "MutexType" : "Shared"
+      },
+      "eventsToWaitFor" : {
+        "Type" : "WaitForEvents",
+        "Events" : [ {
+          "Event" : "JobA_TO_JobB"
+        } ]
+      },
+      "eventsToAdd" : {
+        "Type" : "AddEvents",
+        "Events" : [ {
+          "Event" : "JobB_TO_JobD"
+        } ]
+      },
+      "eventsToDelete" : {
+        "Type" : "DeleteEvents",
+        "Events" : [ {
+          "Event" : "JobA_TO_JobB"
+        } ]
+      }
+    },
+    "JobC" : {
+      "Type" : "Job:Command",
+      "SubApplication" : "Circular Run",
+      "Priority" : "Very High",
+      "Host" : "linuxserver",
+      "RunAs" : "root",
+      "Application" : "Demonstration",
+      "Command" : "_sleep 15",
+      "When" : {
+        "WeekDays" : [ "NONE" ],
+        "MonthDays" : [ "ALL" ],
+        "DaysRelation" : "OR"
+      },
+      "CIRCULAR-RUN-CONTROL" : {
+        "Type" : "Resource:Mutex",
+        "MutexType" : "Shared"
+      },
+      "eventsToWaitFor" : {
+        "Type" : "WaitForEvents",
+        "Events" : [ {
+          "Event" : "JobA_TO_JobC"
+        } ]
+      },
+      "eventsToAdd" : {
+        "Type" : "AddEvents",
+        "Events" : [ {
+          "Event" : "JobC_TO_JobD"
+        } ]
+      },
+      "eventsToDelete" : {
+        "Type" : "DeleteEvents",
+        "Events" : [ {
+          "Event" : "JobA_TO_JobC"
+        } ]
+      }
+    },
+    "JobD" : {
+      "Type" : "Job:Command",
+      "SubApplication" : "Circular Run",
+      "Priority" : "Very High",
+      "Host" : "linuxserver",
+      "RunAs" : "root",
+      "Application" : "Demonstration",
+      "Command" : "dir",
+      "When" : {
+        "WeekDays" : [ "NONE" ],
+        "MonthDays" : [ "ALL" ],
+        "DaysRelation" : "OR"
+      },
+      "CIRCULAR-RUN-CONTROL" : {
+        "Type" : "Resource:Mutex",
+        "MutexType" : "Shared"
+      },
+      "eventsToWaitFor" : {
+        "Type" : "WaitForEvents",
+        "Events" : [ {
+          "Event" : "JobB_TO_JobD"
+        }, {
+          "Event" : "JobC_TO_JobD"
+        } ]
+      },
+      "eventsToAdd" : {
+        "Type" : "AddEvents",
+        "Events" : [ {
+          "Event" : "JobD_TO_JobE"
+        } ]
+      },
+      "eventsToDelete" : {
+        "Type" : "DeleteEvents",
+        "Events" : [ {
+          "Event" : "JobB_TO_JobD"
+        }, {
+          "Event" : "JobC_TO_JobD"
+        } ]
+      }
+    },
+    "JobE" : {
+      "Type" : "Job:Command",
+      "SubApplication" : "Circular Run",
+      "Priority" : "Very High",
+      "Host" : "linuxserver",
+      "RunAs" : "root",
+      "Application" : "Demonstration",
+      "Command" : "dir",
+      "When" : {
+        "WeekDays" : [ "NONE" ],
+        "MonthDays" : [ "ALL" ],
+        "DaysRelation" : "OR"
+      },
+      "CIRCULAR-RUN-CONTROL" : {
+        "Type" : "Resource:Mutex",
+        "MutexType" : "Shared"
+      },
+      "eventsToWaitFor" : {
+        "Type" : "WaitForEvents",
+        "Events" : [ {
+          "Event" : "JobD_TO_JobE"
+        } ]
+      },
+      "eventsToAdd" : {
+        "Type" : "AddEvents",
+        "Events" : [ {
+          "Event" : "JobE_TO_JobF"
+        }, {
+          "Event" : "JobE_TO_JobG"
+        } ]
+      },
+      "eventsToDelete" : {
+        "Type" : "DeleteEvents",
+        "Events" : [ {
+          "Event" : "JobD_TO_JobE"
+        } ]
+      }
+    },
+    "JobF" : {
+      "Type" : "Job:Command",
+      "SubApplication" : "Circular Run",
+      "Priority" : "Very High",
+      "Host" : "linuxserver",
+      "RunAs" : "root",
+      "Application" : "Demonstration",
+      "Command" : "dir",
+      "When" : {
+        "WeekDays" : [ "NONE" ],
+        "MonthDays" : [ "ALL" ],
+        "DaysRelation" : "OR"
+      },
+      "CIRCULAR-RUN-CONTROL" : {
+        "Type" : "Resource:Mutex",
+        "MutexType" : "Shared"
+      },
+      "eventsToWaitFor" : {
+        "Type" : "WaitForEvents",
+        "Events" : [ {
+          "Event" : "JobE_TO_JobF"
+        } ]
+      },
+      "eventsToDelete" : {
+        "Type" : "DeleteEvents",
+        "Events" : [ {
+          "Event" : "JobE_TO_JobF"
+        } ]
+      }
+    },
+    "JobG" : {
+      "Type" : "Job:Command",
+      "SubApplication" : "Circular Run",
+      "Priority" : "Very High",
+      "Host" : "linuxserver",
+      "RunAs" : "root",
+      "Application" : "Demonstration",
+      "Command" : "dir",
+      "When" : {
+        "WeekDays" : [ "NONE" ],
+        "MonthDays" : [ "ALL" ],
+        "DaysRelation" : "OR"
+      },
+      "CIRCULAR-RUN-CONTROL" : {
+        "Type" : "Resource:Mutex",
+        "MutexType" : "Shared"
+      },
+      "eventsToWaitFor" : {
+        "Type" : "WaitForEvents",
+        "Events" : [ {
+          "Event" : "JobE_TO_JobG"
+        } ]
+      },
+      "eventsToDelete" : {
+        "Type" : "DeleteEvents",
+        "Events" : [ {
+          "Event" : "JobE_TO_JobG"
+        } ]
+      }
+    }
+  }
+}
